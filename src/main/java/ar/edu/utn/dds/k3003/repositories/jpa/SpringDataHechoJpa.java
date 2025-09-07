@@ -13,8 +13,7 @@ import java.util.List;
 @Profile("!test")
 public interface SpringDataHechoJpa extends JpaRepository<Hecho, String> {
 
-    List<Hecho> findByColeccionId(String coleccionId);
-    List<Hecho> findByCategoria(CategoriaHechoEnum categoria);
+    List<Hecho> findByNombreColeccion(String nombreColeccion);    List<Hecho> findByCategoria(CategoriaHechoEnum categoria);
     List<Hecho> findByFechaBetween(LocalDateTime desde, LocalDateTime hasta);
     List<Hecho> findByTituloContainingIgnoreCase(String q);
 }

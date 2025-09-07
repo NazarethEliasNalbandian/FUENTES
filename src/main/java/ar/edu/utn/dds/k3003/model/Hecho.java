@@ -16,7 +16,6 @@ import jakarta.persistence.Enumerated;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "hecho")
 public class Hecho {
@@ -50,6 +49,8 @@ public class Hecho {
 
     @Column
     private String origen;
+
+    public Hecho() { }
 
     public Hecho(String id_, String nombreColeccion2, String titulo2, List<String> etiquetas2,
             CategoriaHechoEnum categoria2, String ubicacion2, LocalDateTime fecha2, String origen2) {

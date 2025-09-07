@@ -41,7 +41,8 @@ public class JpaHechoRepository implements HecRepository {
 
     @Override
     public List<Hecho> findByColeccionId(String coleccionId) {
-        return jpa.findByColeccionId(coleccionId);
+        // Delego al nombre de propiedad real en la entidad
+        return jpa.findByNombreColeccion(coleccionId);
     }
 
     @Override
