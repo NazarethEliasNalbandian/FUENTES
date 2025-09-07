@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -174,5 +175,14 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         }
         System.out.println("CORRECTa devolucion DE COLECCIONES");
         return retorno;
+    }
+
+
+    @Override
+    @Transactional
+    public int borrarTodosLosHechos() {
+        int cantidad = this.hechoRepository.count();
+        this.hechoRepository.deleteAll();
+        return cantidad;
     }
 }

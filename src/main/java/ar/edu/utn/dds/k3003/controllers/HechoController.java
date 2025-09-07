@@ -13,9 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/hecho")
@@ -58,6 +56,14 @@ public class HechoController {
         //NO VOY A CAMBIAR LO QUE HAY DESDE BODY, QUE SERIA ALL. DE TODAS MANERASNO ESTOY SEGURO
         retorno = fachadaFuente.agregar(new HechoDTO(id,retorno.nombreColeccion(), retorno.titulo(), ayuda, retorno.categoria(), retorno.ubicacion(), retorno.fecha(), retorno.origen()));
         return ResponseEntity.ok(retorno);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Map<String, Object>> borrarTodos() {
+        int eliminados = fachadaFuente.borrarTodosLosHechos();
+        Map<String, Object> body = new HashMap<>();
+        body.put("eliminados", eliminados);
+        return ResponseEntity.ok(body);
     }
 }
 

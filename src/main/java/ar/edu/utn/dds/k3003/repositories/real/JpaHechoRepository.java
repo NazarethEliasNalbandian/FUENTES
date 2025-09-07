@@ -59,4 +59,8 @@ public class JpaHechoRepository implements HecRepository {
     public List<Hecho> findByTituloContainingIgnoreCase(String q) {
         return jpa.findByTituloContainingIgnoreCase(q);
     }
+
+    // NUEVO
+    @Override public void deleteAll() { jpa.deleteAll(); }
+    @Override public int count() { return (int) jpa.count(); }
 }

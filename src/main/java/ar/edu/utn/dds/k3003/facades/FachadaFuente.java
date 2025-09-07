@@ -22,4 +22,6 @@ public interface FachadaFuente {
   PdIDTO agregar(PdIDTO pdIDTO) throws IllegalStateException;
 
   List<ColeccionDTO> colecciones();
+
+  int borrarTodosLosHechos();
 }

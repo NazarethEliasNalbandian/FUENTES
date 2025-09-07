@@ -12,6 +12,10 @@ public interface HecRepository {
     List<Hecho> allHechos();
     void delete(Hecho h);
 
+    // NUEVO
+    void deleteAll();
+    int count();
+
     // Consultas específicas
     List<Hecho> findByColeccionId(String coleccionId);
     List<Hecho> findByCategoria(CategoriaHechoEnum categoria);
