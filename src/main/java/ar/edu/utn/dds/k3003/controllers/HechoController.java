@@ -85,12 +85,12 @@ public class HechoController {
                                                    @RequestBody PdIDTO body) {
         try {
             // normalizamos el hechoId del body al del path
-            PdIDTO pedido = new PdIDTO(
+            PdIDTO pdi = new PdIDTO(
                     body.id(), id, body.descripcion(), body.lugar(),
                     body.momento(), body.contenido(), body.etiquetas()
             );
 
-            PdIDTO result = fachadaFuente.agregar(pedido); // usa el método existente
+            PdIDTO result = fachadaFuente.agregar(pdi); // usa el método existente
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();        // hecho inexistente
