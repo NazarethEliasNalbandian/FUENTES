@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-@Service
 public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
 
   private final String endpoint;
