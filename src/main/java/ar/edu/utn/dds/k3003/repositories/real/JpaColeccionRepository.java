@@ -1,19 +1,53 @@
 package ar.edu.utn.dds.k3003.repositories.real;
 
 import ar.edu.utn.dds.k3003.model.Coleccion;
+import ar.edu.utn.dds.k3003.repositories.jpa.SpringDataColeccionJpa;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 import java.util.Optional;
 
+// paquete: ar.edu.utn.dds.k3003.repositories
 @Repository
 @Profile("!test")
-public interface JpaColeccionRepository
-        extends JpaRepository<Coleccion, String>, ColeccionRepository {
+public class JpaColeccionRepository implements ColRepository {
 
-    // Spring Data implementa estos métodos por convención
-    boolean existsByNombre(String nombre);
+    private final ar.edu.utn.dds.k3003.repositories.jpa.SpringDataColeccionJpa jpa;
 
-    Optional<Coleccion> findByNombre(String nombre);
+    public JpaColeccionRepository(SpringDataColeccionJpa jpa) {
+        this.jpa = jpa;
+    }
+
+    @Override
+    public Coleccion save(Coleccion c) {
+        return jpa.save(c);
+    }
+
+    @Override
+    public Coleccion findById(String id) {
+        return jpa.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Coleccion> allColeccciones() {
+        return jpa.findAll();
+    }
+
+    @Override
+    public void delete(Coleccion c) {
+        jpa.delete(c);
+    }
+
+    // Si tu interfaz tenía estos (ajustá según tu firma real):
+    @Override
+    public boolean existsByNombre(String nombre) {
+        return jpa.existsByNombre(nombre);
+    }
+
+    @Override
+    public Optional<Coleccion> findByNombre(String nombre) {
+        return jpa.findByNombre(nombre);
+    }
 }
 

@@ -1,25 +1,61 @@
-// Implementación JPA
 package ar.edu.utn.dds.k3003.repositories.real;
 
 import ar.edu.utn.dds.k3003.model.Hecho;
 import ar.edu.utn.dds.k3003.facades.dtos.CategoriaHechoEnum;
+import ar.edu.utn.dds.k3003.repositories.jpa.SpringDataHechoJpa;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 @Profile("!test")
-public interface JpaHechoRepository
-        extends JpaRepository<Hecho, String>, HechoRepository {
+public class JpaHechoRepository implements HecRepository {
 
-    // Derivadas por nombre (no necesitas @Query)
-    List<Hecho> findByColeccionId(String coleccionId);
+    private final SpringDataHechoJpa jpa;
 
-    List<Hecho> findByCategoria(CategoriaHechoEnum categoria);
+    public JpaHechoRepository(SpringDataHechoJpa jpa) {
+        this.jpa = jpa;
+    }
 
-    List<Hecho> findByFechaBetween(LocalDateTime desde, LocalDateTime hasta);
+    @Override
+    public Hecho save(Hecho h) {
+        return jpa.save(h);
+    }
 
-    List<Hecho> findByTituloContainingIgnoreCase(String q);
+    @Override
+    public Hecho findById(String id) {
+        return jpa.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Hecho> allHechos() {
+        return jpa.findAll();
+    }
+
+    @Override
+    public void delete(Hecho h) {
+        jpa.delete(h);
+    }
+
+    @Override
+    public List<Hecho> findByColeccionId(String coleccionId) {
+        return jpa.findByColeccionId(coleccionId);
+    }
+
+    @Override
+    public List<Hecho> findByCategoria(CategoriaHechoEnum categoria) {
+        return jpa.findByCategoria(categoria);
+    }
+
+    @Override
+    public List<Hecho> findByFechaBetween(LocalDateTime desde, LocalDateTime hasta) {
+        return jpa.findByFechaBetween(desde, hasta);
+    }
+
+    @Override
+    public List<Hecho> findByTituloContainingIgnoreCase(String q) {
+        return jpa.findByTituloContainingIgnoreCase(q);
+    }
 }

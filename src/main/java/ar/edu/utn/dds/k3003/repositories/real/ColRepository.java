@@ -5,14 +5,14 @@ import ar.edu.utn.dds.k3003.model.Coleccion;
 import java.util.List;
 import java.util.Optional;
 
-public interface ColeccionRepository {
+public interface ColRepository {
     Coleccion save(Coleccion c);
 
-    Optional<Coleccion> findById(String id);
+    Coleccion findById(String id);
 
-    List<Coleccion> findAll();
+    List<Coleccion> allColeccciones();
 
-    void deleteAll();
+    void delete(Coleccion c);
 
     // Consultas de negocio que vas a querer desde el Service
     boolean existsByNombre(String nombre);
