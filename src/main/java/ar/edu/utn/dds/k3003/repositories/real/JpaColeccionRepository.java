@@ -39,6 +39,9 @@ public class JpaColeccionRepository implements ColRepository {
         jpa.delete(c);
     }
 
+    @Override public void deleteAll() { jpa.deleteAll(); }
+    @Override public int count() { return (int) jpa.count(); }
+
     // Si tu interfaz tenía estos (ajustá según tu firma real):
     @Override
     public boolean existsByNombre(String nombre) {

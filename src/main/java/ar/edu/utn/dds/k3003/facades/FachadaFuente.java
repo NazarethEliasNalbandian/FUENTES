@@ -24,4 +24,6 @@ public interface FachadaFuente {
   List<ColeccionDTO> colecciones();
 
   int borrarTodosLosHechos();
+
+  int borrarTodasLasColecciones();
 }

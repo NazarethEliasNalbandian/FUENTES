@@ -14,6 +14,9 @@ public interface ColRepository {
 
     void delete(Coleccion c);
 
+    void deleteAll();
+    int count();
+
     // Consultas de negocio que vas a querer desde el Service
     boolean existsByNombre(String nombre);
 

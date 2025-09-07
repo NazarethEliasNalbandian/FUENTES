@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/colecciones")
@@ -61,6 +59,14 @@ public class ColeccionController {
         } catch (Exception e){
             return new ResponseEntity<>(new ColeccionDTO("null"," null"),HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Map<String, Object>> borrarTodas() {
+        int eliminadas = fachadaFuente.borrarTodasLasColecciones();
+        Map<String, Object> body = new HashMap<>();
+        body.put("eliminadas", eliminadas);
+        return ResponseEntity.ok(body);
     }
 }
 

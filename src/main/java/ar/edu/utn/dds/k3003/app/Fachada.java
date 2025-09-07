@@ -185,4 +185,15 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         this.hechoRepository.deleteAll();
         return cantidad;
     }
+
+    @Override
+    @Transactional
+    public int borrarTodasLasColecciones() {
+        // Primero borro todos los hechos (opcional)
+        this.hechoRepository.deleteAll();
+        int cantidad = this.coleccionRepository.count();
+        this.coleccionRepository.deleteAll();
+        return cantidad;
+    }
+
 }
