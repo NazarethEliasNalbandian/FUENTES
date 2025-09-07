@@ -28,6 +28,13 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
   private final ProcesadorPdIRetrofit service;
   private final ObjectMapper mapper;
 
+  public ProcesadorPdiProxy(ObjectMapper objectMapper) {
+    this(
+            objectMapper,
+            System.getenv().getOrDefault("URL_PROCESADOR", "http://localhost:8080/")
+    );
+  }
+
   public ProcesadorPdiProxy(
           ObjectMapper objectMapper,
           @Value("${URL_PROCESADOR:http://localhost:8080/}") String endpointEnv
