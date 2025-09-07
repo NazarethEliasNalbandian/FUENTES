@@ -11,13 +11,19 @@ import ar.edu.utn.dds.k3003.facades.FachadaProcesadorPdI;
 import ar.edu.utn.dds.k3003.facades.dtos.ColeccionDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
-import ar.edu.utn.dds.k3003.repositories.*;
+import ar.edu.utn.dds.k3003.repositories.real.ColRepository;
+import ar.edu.utn.dds.k3003.repositories.real.HecRepository;
+import ar.edu.utn.dds.k3003.repositories.PdiRepository;
+import ar.edu.utn.dds.k3003.repositories.ColeccionMapper;
+import ar.edu.utn.dds.k3003.repositories.HechoMapper;
+import ar.edu.utn.dds.k3003.repositories.PdiMapper;
 
 @Service
 public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
-    private ColeccionRepository coleccionRepository;
-    private HechoRepository hechoRepository;
-    private PdiRepository pdiRepository;
+
+    private ColRepository coleccionRepository;   // <- interfaz real
+    private HecRepository hechoRepository;       // <- interfaz real
+    private PdiRepository pdiRepository;         // <- siempre en memoria
     private ColeccionMapper coleccionMapper;
     private HechoMapper hechoMapper;
     private PdiMapper pdiMapper;
@@ -25,15 +31,15 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
     @Autowired
     private FachadaProcesadorPdI fachadaprocesadorPdI;
 
-    // Constructor vacío (ya no inicializa nada)
+    // Constructor vacío (opcional; no inicializa nada)
     Fachada() {
     }
 
-    // Constructor con inyección de dependencias
+    // Inyección por constructor con las interfaces reales
     @Autowired
     public Fachada(
-            ColeccionRepository coleccionRepository,
-            HechoRepository hechoRepository,
+            ColRepository coleccionRepository,
+            HecRepository hechoRepository,
             PdiRepository pdiRepository,
             ColeccionMapper coleccionMapper,
             HechoMapper hechoMapper,
@@ -47,7 +53,7 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         this.pdiMapper = pdiMapper;
     }
 
-    public HechoRepository getHechoRepository() {
+    public HecRepository getHechoRepository() {
         return this.hechoRepository;
     }
 
@@ -55,7 +61,7 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         return this.hechoMapper;
     }
 
-    public ColeccionRepository getColeccionRepository() {
+    public ColRepository getColeccionRepository() {
         return this.coleccionRepository;
     }
 
