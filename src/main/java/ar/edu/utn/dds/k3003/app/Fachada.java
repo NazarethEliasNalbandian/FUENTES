@@ -121,27 +121,6 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         return hechoMapper.map(this.hechoRepository.save(hechoMapper.map(hechoDTO)));
     }
 
-
-    @Override
-    public PdIDTO agregar(PdIDTO pdiDTO) {
-        try {
-            PdIDTO pedidoProcesador = fachadaprocesadorPdI.procesar(pdiDTO);
-            pdiDTO = pedidoProcesador;
-        } catch (Exception e) {
-            System.out.println("No funciono la conexion");
-            throw new IllegalStateException("Ha resultado invalido el procesamiento de la PDI");
-        }
-        if (pdiDTO == null) {
-            throw new IllegalStateException();
-        }
-
-        if (Objects.isNull(buscarHechoXId(pdiDTO.hechoId()))) {
-            return null;
-        }
-        System.out.println("CORRECTO AGREGADO DE PDI");
-        return pdiMapper.map(this.pdiRepository.save(pdiMapper.map(pdiDTO)));
-    }
-
     @Override
     public ColeccionDTO buscarColeccionXId(String idColeccion) {
         System.out.println("CORRECTA BUSQUEDA DE COLECCION POR ID");
@@ -226,6 +205,40 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
                 .filter(h -> EstadoHechoEnum.ACTIVO.equals(h.getEstado()))
                 .map(this.hechoMapper::map)
                 .toList();
+    }
+
+    // en ar.edu.utn.dds.k3003.app.Fachada
+    @Override
+    @jakarta.transaction.Transactional
+    public PdIDTO agregar(PdIDTO pdiDTO) throws IllegalStateException {
+        if (pdiDTO == null) throw new IllegalArgumentException("PdIDTO requerido");
+        if (pdiDTO.hechoId() == null || pdiDTO.hechoId().isBlank())
+            throw new IllegalArgumentException("hechoId requerido en PdIDTO");
+
+        Hecho hecho = this.hechoRepository.findById(pdiDTO.hechoId());
+        if (hecho == null) throw new NoSuchElementException("Hecho no encontrado: " + pdiDTO.hechoId());
+
+        PdIDTO procesado;
+        try {
+            procesado = fachadaprocesadorPdI.procesar(pdiDTO);
+        } catch (Exception e) {
+            throw new IllegalStateException("Ha resultado inválido el procesamiento de la PdI", e);
+        }
+        if (procesado == null) throw new IllegalStateException("ProcesadorPdI devolvió nulo");
+
+        PdIDTO guardado = this.pdiMapper.map(this.pdiRepository.save(this.pdiMapper.map(procesado)));
+        String pdiId = guardado.id();
+        if (pdiId == null || pdiId.isBlank()) {
+            throw new IllegalStateException("El PdI no tiene id luego de persistir");
+        }
+
+        if (hecho.getPdiIds() == null) hecho.setPdiIds(new ArrayList<>());
+        if (!hecho.getPdiIds().contains(pdiId)) {
+            hecho.getPdiIds().add(pdiId);
+            this.hechoRepository.save(hecho);
+        }
+
+        return guardado;
     }
 
 }

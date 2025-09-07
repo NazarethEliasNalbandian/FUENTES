@@ -7,6 +7,7 @@ package ar.edu.utn.dds.k3003.controllers;
 import ar.edu.utn.dds.k3003.facades.FachadaFuente;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoEstadoRequestDTO;
+import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
 import ar.edu.utn.dds.k3003.model.Hecho;
 
@@ -77,6 +78,27 @@ public class HechoController {
             return ResponseEntity.noContent().build(); // 204 si no hay
         }
         return ResponseEntity.ok(activos); // 200 con la lista
+    }
+
+    @PostMapping("/{id}/pdis")
+    public ResponseEntity<PdIDTO> agregarPdiAHecho(@PathVariable String id,
+                                                   @RequestBody PdIDTO body) {
+        try {
+            // normalizamos el hechoId del body al del path
+            PdIDTO pedido = new PdIDTO(
+                    body.id(), id, body.descripcion(), body.lugar(),
+                    body.momento(), body.contenido(), body.etiquetas()
+            );
+
+            PdIDTO result = fachadaFuente.agregar(pedido); // usa el método existente
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();        // hecho inexistente
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();                        // datos inválidos
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(422).build();                         // no se pudo procesar PdI
+        }
     }
 }
 
