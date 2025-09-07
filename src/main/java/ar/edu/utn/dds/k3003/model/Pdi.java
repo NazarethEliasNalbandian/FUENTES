@@ -3,14 +3,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Data;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+@Data
+@Entity 
 public class Pdi {
+    @Id
     private String id;
+    @Column
     private String hecho;
+    @Column
     private String lugar;
+    @Column
     private String descripcion;
+    @Column
     private String contenido;
+    @ElementCollection
     private List<String> etiquetas;
+    @Column
     private LocalDateTime momento;
     public Pdi(String _id,String _hechoId, String _lugar,String _descripcion,String _contenido,List<String> _etiquetas, LocalDateTime _momento){
         this.id = _id;

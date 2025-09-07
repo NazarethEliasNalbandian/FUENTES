@@ -1,10 +1,31 @@
 package ar.edu.utn.dds.k3003.repositories;
 
 import ar.edu.utn.dds.k3003.model.Coleccion;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ColeccionRepository extends JpaRepository<Coleccion, String> {
-    boolean existsByNombre(String nombre);
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class ColeccionRepository {
+    List<Coleccion> colecciones;
+    public ColeccionRepository(){
+        colecciones = new ArrayList<>();
+    }
+    public Coleccion save(Coleccion coleccionGuardar){
+        colecciones.add(coleccionGuardar);
+        return coleccionGuardar;
+    }
+    public void delete(Coleccion coleccionEliminar){
+        colecciones.remove(coleccionEliminar);
+    }
+    public List<Coleccion> allColeccciones(){
+        return this.colecciones;
+    }
+    public Coleccion findById(String id_coleccion){
+       Coleccion coleccionEncontrada = colecciones.stream()
+        .filter(coleccion -> coleccion.getNombre().equals(id_coleccion))
+        .findFirst()
+        .orElse(null);
+       return coleccionEncontrada;
+    }  
 }
