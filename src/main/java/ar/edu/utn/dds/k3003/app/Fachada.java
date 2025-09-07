@@ -220,4 +220,12 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         return this.hechoMapper.map(guardado);
     }
 
+    @Override
+    public List<HechoDTO> hechosActivos() {
+        return this.hechoRepository.allHechos().stream()
+                .filter(h -> EstadoHechoEnum.ACTIVO.equals(h.getEstado()))
+                .map(this.hechoMapper::map)
+                .toList();
+    }
+
 }

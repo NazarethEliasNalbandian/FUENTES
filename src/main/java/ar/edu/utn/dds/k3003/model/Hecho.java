@@ -58,7 +58,6 @@ public class Hecho {
         ubicacion= ubicacion2;
         fecha = fecha2;
         origen = origen2;
-        this.estado = EstadoHechoEnum.ACTIVO;
     }
 
     @PrePersist

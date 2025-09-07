@@ -69,5 +69,14 @@ public class HechoController {
         body.put("eliminados", eliminados);
         return ResponseEntity.ok(body);
     }
+
+    @GetMapping("/activos")
+    public ResponseEntity<List<HechoDTO>> listarActivos() {
+        List<HechoDTO> activos = fachadaFuente.hechosActivos();
+        if (activos.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 si no hay
+        }
+        return ResponseEntity.ok(activos); // 200 con la lista
+    }
 }
 

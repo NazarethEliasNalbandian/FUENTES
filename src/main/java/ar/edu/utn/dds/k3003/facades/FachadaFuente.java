@@ -30,4 +30,6 @@ public interface FachadaFuente {
   int borrarTodasLasColecciones();
 
   HechoDTO actualizarEstado(String hechoId, EstadoHechoEnum nuevoEstado);
+
+  List<HechoDTO> hechosActivos();
 }
