@@ -6,6 +6,8 @@ package ar.edu.utn.dds.k3003.controllers;
 
 import ar.edu.utn.dds.k3003.facades.FachadaFuente;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
+import ar.edu.utn.dds.k3003.facades.dtos.HechoEstadoRequestDTO;
+import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
 import ar.edu.utn.dds.k3003.model.Hecho;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +44,22 @@ public class HechoController {
         }
         return ResponseEntity.ok(retorno);
     }
-//Ver esto
-    @PatchMapping("/{id}") //DEBATIBLE
-    public ResponseEntity<HechoDTO> corregirEstado(@PathVariable String id, @RequestBody Hecho body) {
-        HechoDTO retorno = fachadaFuente.buscarHechoXId(id);
-        if(Objects.isNull(retorno)){
-            return new ResponseEntity<>(new HechoDTO("null","null","null"),HttpStatus.BAD_REQUEST);
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<HechoDTO> corregirEstado(@PathVariable String id,
+                                                   @RequestBody HechoEstadoRequestDTO body) {
+        try {
+            HechoDTO hecho = fachadaFuente.buscarHechoXId(id);
+            EstadoHechoEnum nuevoEstado = EstadoHechoEnum.valueOf(body.estado().toUpperCase());
+
+            HechoDTO actualizado = fachadaFuente.actualizarEstado(id, nuevoEstado);
+
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
         }
-        List<String> ayuda = new ArrayList<>();
-        ayuda.addAll(retorno.etiquetas());
-        ayuda.addAll(body.getEtiquetas());
-        //NO ESTOY SEGURO DE ESTO
-        //NO VOY A CAMBIAR LO QUE HAY DESDE BODY, QUE SERIA ALL. DE TODAS MANERASNO ESTOY SEGURO
-        retorno = fachadaFuente.agregar(new HechoDTO(id,retorno.nombreColeccion(), retorno.titulo(), ayuda, retorno.categoria(), retorno.ubicacion(), retorno.fecha(), retorno.origen()));
-        return ResponseEntity.ok(retorno);
     }
 
     @DeleteMapping

@@ -2,8 +2,11 @@ package ar.edu.utn.dds.k3003.app;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
+import ar.edu.utn.dds.k3003.model.Hecho;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -194,6 +197,27 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         int cantidad = this.coleccionRepository.count();
         this.coleccionRepository.deleteAll();
         return cantidad;
+    }
+
+    @Override
+    @Transactional
+    public HechoDTO actualizarEstado(String hechoId, EstadoHechoEnum nuevoEstado) {
+        if (hechoId == null || hechoId.isBlank()) {
+            throw new IllegalArgumentException("hechoId requerido");
+        }
+        if (nuevoEstado == null) {
+            throw new IllegalArgumentException("nuevoEstado requerido");
+        }
+
+        Hecho h = this.hechoRepository.findById(hechoId);
+        if (h == null) {
+            throw new NoSuchElementException("Hecho no encontrado: " + hechoId);
+        }
+
+        h.setEstado(nuevoEstado);
+        Hecho guardado = this.hechoRepository.save(h); // upsert en tu repo
+
+        return this.hechoMapper.map(guardado);
     }
 
 }

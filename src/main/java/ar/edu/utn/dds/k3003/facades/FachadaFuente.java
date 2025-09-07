@@ -3,6 +3,8 @@ package ar.edu.utn.dds.k3003.facades;
 import ar.edu.utn.dds.k3003.facades.dtos.ColeccionDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
+import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -26,4 +28,6 @@ public interface FachadaFuente {
   int borrarTodosLosHechos();
 
   int borrarTodasLasColecciones();
+
+  HechoDTO actualizarEstado(String hechoId, EstadoHechoEnum nuevoEstado);
 }

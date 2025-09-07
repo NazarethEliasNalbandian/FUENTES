@@ -50,6 +50,10 @@ public class Hecho {
     @Column
     private String origen;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoHechoEnum estado = EstadoHechoEnum.ACTIVO;
+
     public Hecho() { }
 
     public Hecho(String id_, String nombreColeccion2, String titulo2, List<String> etiquetas2,
@@ -62,6 +66,12 @@ public class Hecho {
         ubicacion= ubicacion2;
         fecha = fecha2;
         origen = origen2;
+        this.estado = EstadoHechoEnum.ACTIVO;
+    }
+
+    @PrePersist
+    public void ensureEstadoDefault() {
+        if (estado == null) estado = EstadoHechoEnum.ACTIVO;
     }
     public String getId(){
         return this.id;
