@@ -2,7 +2,9 @@ package ar.edu.utn.dds.k3003.repositories;
 
 import ar.edu.utn.dds.k3003.model.Hecho;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HechoMapper {
     public HechoDTO map(Hecho hecho){
         if(hecho ==null){

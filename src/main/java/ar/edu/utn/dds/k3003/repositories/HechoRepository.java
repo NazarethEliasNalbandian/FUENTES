@@ -4,7 +4,11 @@ import java.util.List;
 
 
 import ar.edu.utn.dds.k3003.model.Hecho;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
+@Repository
+@Profile("test")
 public class HechoRepository {
     private List<Hecho> hechos;
     public HechoRepository(){

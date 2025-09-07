@@ -1,11 +1,14 @@
 package ar.edu.utn.dds.k3003.repositories;
 
 import ar.edu.utn.dds.k3003.model.Coleccion;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Repository
+@Profile("test")
 public class ColeccionRepository {
     List<Coleccion> colecciones;
     public ColeccionRepository(){

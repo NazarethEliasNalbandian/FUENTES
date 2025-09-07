@@ -2,7 +2,9 @@ package ar.edu.utn.dds.k3003.repositories;
 
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import ar.edu.utn.dds.k3003.model.Pdi;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PdiMapper {
     public PdIDTO map(Pdi pdi){
         if(pdi.equals(null)){
