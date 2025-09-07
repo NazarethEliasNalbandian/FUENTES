@@ -89,11 +89,18 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
 
     @Override
     public HechoDTO agregar(HechoDTO hechoDTO) {
-        if (Objects.isNull(buscarColeccionXId(hechoDTO.nombreColeccion()))) {
+        if (hechoDTO == null) throw new IllegalArgumentException("HechoDTO requerido");
+
+        // normalizo strings
+        String coleccion = hechoDTO.nombreColeccion() == null ? null : hechoDTO.nombreColeccion().trim();
+        String id        = hechoDTO.id() == null ? null : hechoDTO.id().trim();
+
+        if (coleccion == null || buscarColeccionXId(coleccion) == null) {
             throw new IllegalArgumentException("No hay una coleccion para asociar al hecho");
         }
-        HechoDTO comparable = this.buscarHechoXId(hechoDTO.id());
-        if (!Objects.isNull(comparable)) {
+
+        HechoDTO comparable = (id == null) ? null : this.buscarHechoXId(id);
+        if (comparable != null) {
             if (Objects.equals(comparable.nombreColeccion(), hechoDTO.nombreColeccion())
                     && Objects.equals(comparable.ubicacion(), hechoDTO.ubicacion())
                     && Objects.equals(comparable.titulo(), hechoDTO.titulo())
@@ -101,21 +108,15 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
                     && Objects.equals(comparable.etiquetas(), hechoDTO.etiquetas())
                     && Objects.equals(comparable.origen(), hechoDTO.origen())
                     && Objects.equals(comparable.fecha(), hechoDTO.fecha())) {
-                System.out.println("ES DECIR, LLEGAMOS CON COLECCION: " + comparable.nombreColeccion()
-                        + "ES DECIR, LLEGAMOS CON UBICACION: " + comparable.ubicacion()
-                        + "ES DECIR, LLEGAMOS CON TITULO: " + comparable.titulo()
-                        + "ES DECIR, LLEGAMOS CON CATEGORIA: " + comparable.categoria()
-                        + "ES DECIR, LLEGAMOS CON ETIQUETAS: " + comparable.etiquetas()
-                        + "ES DECIR, LLEGAMOS CON ORIGEN: " + comparable.origen()
-                        + "ES DECIR, LLEGAMOS CON FECHA: " + comparable.fecha());
                 throw new IllegalArgumentException("El hecho ya fue agregado anteriormente");
             } else {
                 this.hechoRepository.delete(this.hechoRepository.findById(comparable.id()));
             }
         }
-        System.out.println("CORRECTO AGREGADO DE HECHO");
+
         return hechoMapper.map(this.hechoRepository.save(hechoMapper.map(hechoDTO)));
     }
+
 
     @Override
     public PdIDTO agregar(PdIDTO pdiDTO) {
