@@ -27,7 +27,7 @@ public class HechoController {
         this.fachadaFuente = fachadaFuente;
     }
 
-    @PostMapping
+/*    @PostMapping
     public ResponseEntity<HechoDTO> crearHecho(@RequestBody Hecho hecho) {
         HechoDTO hechoDTO = new HechoDTO(hecho.getId(),hecho.getNombreColeccion(),hecho.getTitulo(),hecho.getEtiquetas(),hecho.getCategoria(),hecho.getUbicacion(),hecho.getFecha(),hecho.getOrigen());
         try {
@@ -35,7 +35,7 @@ public class HechoController {
         } catch (Exception e){
             return new ResponseEntity<>(new HechoDTO("null"," null","null"),HttpStatus.BAD_REQUEST);
         }
-    }
+    }*/
 
     @GetMapping("/{id}")
     public ResponseEntity<HechoDTO> obtenerHecho(@PathVariable String id) {

@@ -6,6 +6,7 @@ import ar.edu.utn.dds.k3003.facades.dtos.ColeccionDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.model.Coleccion;
 
+import ar.edu.utn.dds.k3003.model.Hecho;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,29 @@ public class ColeccionController {
             return new ResponseEntity<>(new ColeccionDTO("null"," null"),HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("{nombre}/hechos")
+    public ResponseEntity<HechoDTO> crearHecho(
+            @PathVariable("nombre") String nombreColeccion,
+            @RequestBody Hecho hecho) {
+        HechoDTO hechoDTO = new HechoDTO(
+                hecho.getId(),
+                nombreColeccion,
+                hecho.getTitulo(),
+                hecho.getEtiquetas(),
+                hecho.getCategoria(),
+                hecho.getUbicacion(),
+                hecho.getFecha(),
+                hecho.getOrigen()
+        );
+        try {
+            HechoDTO creado = fachadaFuente.agregar(hechoDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
     @DeleteMapping
     public ResponseEntity<Map<String, Object>> borrarTodas() {
