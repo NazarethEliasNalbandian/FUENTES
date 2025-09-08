@@ -123,9 +123,13 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
       throw new IllegalArgumentException("hechoId requerido en PdIDTO");
 
     try {
-      log.info("Fuentes → ProcesadorPdI request JSON: {}", mapper.writeValueAsString(pdi));
+      // 👉 construimos un body “slim” sin nulls ni strings vacíos
+      PdICreateRequest req = toCreateRequest(pdi);
 
-      Response<PdIDTO> resp = service.procesar(pdi).execute();
+      // Log del JSON realmente enviado (ya saneado)
+      log.info("Fuentes → ProcesadorPdI request JSON: {}", mapper.writeValueAsString(req));
+
+      Response<PdIDTO> resp = service.procesar(req).execute();
 
       log.info("ProcesadorPdI status={} message={} headers={}",
               resp.code(), resp.message(), resp.headers());
@@ -153,6 +157,24 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
       throw new RuntimeException("Error conectándose con el componente ProcesadorPdI", e);
     }
   }
+
+  /** Helpers **/
+
+  private static String blankToNull(String s) {
+    return (s == null || s.isBlank()) ? null : s.trim();
+  }
+
+  private static PdICreateRequest toCreateRequest(PdIDTO p) {
+    // hechoId ya validado arriba; el resto se sanea ("" -> null)
+    return new PdICreateRequest(
+            p.hechoId(),
+            blankToNull(p.descripcion()),
+            blankToNull(p.lugar()),
+            p.momento(),              // si viene null, no se serializa por @JsonInclude(NON_NULL)
+            blankToNull(p.contenido())
+    );
+  }
+
 
   private static String safeReadBody(ResponseBody body) {
     if (body == null) return "";
