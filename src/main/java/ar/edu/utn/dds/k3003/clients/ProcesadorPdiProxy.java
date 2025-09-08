@@ -2,6 +2,7 @@ package ar.edu.utn.dds.k3003.clients;
 
 import ar.edu.utn.dds.k3003.facades.FachadaProcesadorPdI;
 import ar.edu.utn.dds.k3003.facades.FachadaSolicitudes;
+import ar.edu.utn.dds.k3003.facades.dtos.PdICreateRequest;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
