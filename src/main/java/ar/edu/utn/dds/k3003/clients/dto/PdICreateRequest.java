@@ -1,4 +1,4 @@
-package ar.edu.utn.dds.k3003.facades.dtos;
+package ar.edu.utn.dds.k3003.clients.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
