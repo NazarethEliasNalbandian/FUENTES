@@ -81,24 +81,28 @@ public class HechoController {
     }
 
     @PostMapping("/{id}/pdis")
-    public ResponseEntity<PdIDTO> agregarPdiAHecho(@PathVariable String id,
-                                                   @RequestBody PdIDTO body) {
+    public ResponseEntity<PdIDTO> agregarPdiAHecho(@PathVariable String id, @RequestBody PdIDTO body) {
         try {
-            // normalizamos el hechoId del body al del path
+            var etiquetasSeguras = (body.etiquetas() == null) ? List.<String>of() : body.etiquetas();
             PdIDTO pdi = new PdIDTO(
-                    body.id(), id, body.descripcion(), body.lugar(),
-                    body.momento(), body.contenido(), body.etiquetas()
+                    null,                       // id lo genera Procesador
+                    id,                         // hechoId desde la URL (no dependemos del body)
+                    body.descripcion(),
+                    body.lugar(),
+                    body.momento(),             // asegurate que en Postman sea "2025-10-09T14:00:00"
+                    body.contenido(),
+                    etiquetasSeguras
             );
-
-            PdIDTO result = fachadaFuente.agregar(pdi); // usa el método existente
+            PdIDTO result = fachadaFuente.agregar(pdi);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();        // hecho inexistente
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();                        // datos inválidos
+            return ResponseEntity.badRequest().build();
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(422).build();                         // no se pudo procesar PdI
+            return ResponseEntity.status(422).build();
         }
     }
+
 }
 

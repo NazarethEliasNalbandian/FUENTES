@@ -78,10 +78,15 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
       throw new IllegalArgumentException("hechoId requerido en PdIDTO");
 
     try {
-      // Log de lo que enviamos (en snake_case por configuración global del mapper)
       log.info("Fuentes → ProcesadorPdI request JSON: {}", mapper.writeValueAsString(pdi));
-
       Response<PdIDTO> resp = service.procesar(pdi).execute();
+      log.info("ProcesadorPdI status={} message={} headers={}", resp.code(), resp.message(), resp.headers());
+      if (resp.isSuccessful()) {
+        log.info("ProcesadorPdI → Fuentes body OK: {}", mapper.writeValueAsString(resp.body()));
+      } else {
+        String errorBody = (resp.errorBody()!=null)? resp.errorBody().string() : "";
+        log.warn("ProcesadorPdI → Fuentes body ERROR: {}", errorBody);
+      }
 
       if (resp.isSuccessful()) {
         PdIDTO body = resp.body();
