@@ -1,5 +1,6 @@
 package ar.edu.utn.dds.k3003.facades;
 
+import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.ColeccionDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
@@ -21,7 +22,7 @@ public interface FachadaFuente {
 
   void setProcesadorPdI(FachadaProcesadorPdI procesador);
 
-  PdIDTO agregar(PdIDTO pdIDTO) throws IllegalStateException;
+  ProcesamientoResponseDTO agregar(PdIDTO pdIDTO) throws IllegalStateException;
 
   List<ColeccionDTO> colecciones();
 

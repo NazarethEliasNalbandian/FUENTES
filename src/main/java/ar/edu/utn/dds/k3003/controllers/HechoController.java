@@ -4,6 +4,7 @@ package ar.edu.utn.dds.k3003.controllers;
  MediaType contentType = entity.getHeaders().getContentType();
  HttpStatus statusCode = entity.getStatusCode();*/
 
+import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.facades.FachadaFuente;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoEstadoRequestDTO;
@@ -81,28 +82,40 @@ public class HechoController {
     }
 
     @PostMapping("/{id}/pdis")
-    public ResponseEntity<PdIDTO> agregarPdiAHecho(@PathVariable String id, @RequestBody PdIDTO body) {
+    public ResponseEntity<ProcesamientoResponseDTO> agregarPdiAHecho(
+            @PathVariable String id,
+            @RequestBody PdIDTO body) {
         try {
-            var etiquetasSeguras = (body.etiquetas() == null) ? List.<String>of() : body.etiquetas();
+            // El hechoId SIEMPRE viene de la URL
             PdIDTO pdi = new PdIDTO(
-                    null,                       // id lo genera Procesador
-                    id,                         // hechoId desde la URL (no dependemos del body)
+                    null,                     // lo genera Procesador
+                    id,                       // hechoId
                     body.descripcion(),
                     body.lugar(),
-                    body.momento(),             // asegurate que en Postman sea "2025-10-09T14:00:00"
+                    body.momento(),           // formatear "2025-10-09T14:00:00" si hace falta
                     body.contenido(),
-                    etiquetasSeguras
+                    List.of()                 // etiquetas del body se ignoran: vienen del Procesador
             );
-            PdIDTO result = fachadaFuente.agregar(pdi);
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+            // Delegamos el flujo completo (procesar + actualizar Hecho si corresponde)
+            ProcesamientoResponseDTO res = fachadaFuente.agregar(pdi);
+
+            // Si procesó, 201; si no, 200 con procesada=false
+            return ResponseEntity.status(res.procesada() ? HttpStatus.CREATED : HttpStatus.OK).body(res);
+
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            // No existe el Hecho (o la Colección del Hecho)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ProcesamientoResponseDTO(null, false, List.of()));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .body(new ProcesamientoResponseDTO(null, false, List.of()));
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(422).build();
+            return ResponseEntity.status(422)
+                    .body(new ProcesamientoResponseDTO(null, false, List.of()));
         }
     }
+
 
 }
 

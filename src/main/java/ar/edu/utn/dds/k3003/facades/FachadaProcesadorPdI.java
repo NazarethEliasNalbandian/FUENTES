@@ -1,12 +1,13 @@
 package ar.edu.utn.dds.k3003.facades;
 
+import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 public interface FachadaProcesadorPdI {
 
-  PdIDTO procesar(PdIDTO pdi) throws IllegalStateException;
+  ProcesamientoResponseDTO procesar(PdIDTO pdi) throws IllegalStateException;
 
   PdIDTO buscarPdIPorId(String pdiId) throws NoSuchElementException;
 

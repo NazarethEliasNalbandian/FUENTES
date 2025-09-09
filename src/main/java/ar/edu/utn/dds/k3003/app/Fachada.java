@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
 import ar.edu.utn.dds.k3003.model.Hecho;
 import jakarta.transaction.Transactional;
@@ -210,35 +211,48 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
     // en ar.edu.utn.dds.k3003.app.Fachada
     @Override
     @jakarta.transaction.Transactional
-    public PdIDTO agregar(PdIDTO pdiDTO) throws IllegalStateException {
+    public ProcesamientoResponseDTO agregar(PdIDTO pdiDTO) throws IllegalStateException {
         if (pdiDTO == null) throw new IllegalArgumentException("PdIDTO requerido");
         if (pdiDTO.hechoId() == null || pdiDTO.hechoId().isBlank())
             throw new IllegalArgumentException("hechoId requerido en PdIDTO");
 
         Hecho hecho = this.hechoRepository.findById(pdiDTO.hechoId());
-        if (hecho == null) throw new NoSuchElementException("Hecho no encontrado: " + pdiDTO.hechoId());
+        if (hecho == null)
+            throw new NoSuchElementException("Hecho no encontrado: " + pdiDTO.hechoId());
 
-        PdIDTO procesado;
+        // 1) Procesar en ProcesadorPdI y recibir el resumen
+        final ProcesamientoResponseDTO proc;
         try {
-            procesado = fachadaprocesadorPdI.procesar(pdiDTO);
+            proc = fachadaprocesadorPdI.procesar(pdiDTO);
         } catch (Exception e) {
             throw new IllegalStateException("Ha resultado inválido el procesamiento de la PdI", e);
         }
-        if (procesado == null) throw new IllegalStateException("ProcesadorPdI devolvió nulo");
+        if (proc == null) throw new IllegalStateException("ProcesadorPdI devolvió nulo");
 
-        PdIDTO guardado = this.pdiMapper.map(this.pdiRepository.save(this.pdiMapper.map(procesado)));
-        String pdiId = guardado.id();
-        if (pdiId == null || pdiId.isBlank()) {
-            throw new IllegalStateException("El PdI no tiene id luego de persistir");
+        // 2) Si NO se procesó, no persistimos nada y devolvemos tal cual
+        if (!proc.procesada()) {
+            return proc;
         }
 
-        if (hecho.getPdiIds() == null) hecho.setPdiIds(new ArrayList<>());
-        if (!hecho.getPdiIds().contains(pdiId)) {
+        // 3) Actualizar Hecho: unir etiquetas y agregar pdiId (sin duplicar) y persistir
+        if (hecho.getEtiquetas() == null) hecho.setEtiquetas(new java.util.ArrayList<>());
+        if (hecho.getPdiIds() == null) hecho.setPdiIds(new java.util.ArrayList<>());
+
+        java.util.LinkedHashSet<String> union = new java.util.LinkedHashSet<>(hecho.getEtiquetas());
+        if (proc.etiquetas() != null) union.addAll(proc.etiquetas());
+        hecho.setEtiquetas(new java.util.ArrayList<>(union));
+
+        String pdiId = proc.pdiId();
+        if (pdiId != null && !pdiId.isBlank() && !hecho.getPdiIds().contains(pdiId)) {
             hecho.getPdiIds().add(pdiId);
-            this.hechoRepository.save(hecho);
         }
 
-        return guardado;
+        this.hechoRepository.save(hecho);
+
+        // 4) Devolver el resultado al caller (controller)
+        return proc;
     }
+
+
 
 }

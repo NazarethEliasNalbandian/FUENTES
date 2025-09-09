@@ -1,6 +1,7 @@
 package ar.edu.utn.dds.k3003.clients;
 
 import ar.edu.utn.dds.k3003.clients.dto.PdICreateRequest;
+import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.facades.FachadaProcesadorPdI;
 import ar.edu.utn.dds.k3003.facades.FachadaSolicitudes;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
@@ -17,6 +18,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -57,37 +59,47 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
       return chain.proceed(reqWithId);
     };
 
-    // Retry 1 vez en 5xx o IOException con backoff
+    // Retry simple: 1 reintento en 5xx/IOException con backoff exponencial
     Interceptor retryInterceptor = chain -> {
-      var req = chain.request();
-      int attempts = 0, max = 2;
-      long backoff = 250;
+      Request req = chain.request();
+      int attempts = 0;
+      int max = 2;           // 1 intento + 1 reintento
+      long backoff = 250L;   // ms
+
       while (true) {
         attempts++;
+        okhttp3.Response resp = null;
         try {
-          var resp = chain.proceed(req);
+          resp = chain.proceed(req);
+
           if (resp.code() >= 500 && attempts < max) {
-            if (resp.body() != null) resp.close();
-            Thread.sleep(backoff);
+            // liberar recursos antes de reintentar
+            resp.close();
+            try {
+              Thread.sleep(backoff);
+            } catch (InterruptedException ie) {
+              Thread.currentThread().interrupt();
+              throw new IOException("Interrumpido durante el backoff", ie);
+            }
             backoff *= 2;
             continue;
           }
+          // devolver la respuesta (NO cerrar: la consumirá Retrofit)
           return resp;
-        } catch (Exception ex) {
+
+        } catch (IOException ioe) {
+          if (resp != null) resp.close();
           if (attempts < max) {
-              try {
-                  Thread.sleep(backoff);
-              } catch (InterruptedException e) {
-                  throw new RuntimeException(e);
-              }
-              backoff *= 2;
+            try {
+              Thread.sleep(backoff);
+            } catch (InterruptedException ie) {
+              Thread.currentThread().interrupt();
+              throw new IOException("Interrumpido durante el backoff", ie);
+            }
+            backoff *= 2;
             continue;
           }
-            try {
-                throw ex;
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+          throw ioe;
         }
       }
     };
@@ -118,35 +130,42 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
   }
 
   @Override
-  public PdIDTO procesar(PdIDTO pdi) throws NoSuchElementException {
+  public ProcesamientoResponseDTO procesar(PdIDTO pdi) {
     Objects.requireNonNull(pdi, "PdIDTO requerido");
     if (pdi.hechoId() == null || pdi.hechoId().isBlank())
       throw new IllegalArgumentException("hechoId requerido en PdIDTO");
 
     try {
-      // 👉 construimos un body “slim” sin nulls ni strings vacíos
+      // Body “slim” sin nulls/strings vacíos
       PdICreateRequest req = toCreateRequest(pdi);
 
-      // Log del JSON realmente enviado (ya saneado)
       log.info("Fuentes → ProcesadorPdI request JSON: {}", mapper.writeValueAsString(req));
 
-      Response<PdIDTO> resp = service.procesar(req).execute();
+      // Asegurá la firma del Retrofit:
+      // Call<ProcesamientoResponseDTO> procesar(@Body PdICreateRequest req);
+      Response<ProcesamientoResponseDTO> resp = service.procesar(req).execute();
 
       log.info("ProcesadorPdI status={} message={} headers={}",
               resp.code(), resp.message(), resp.headers());
 
       if (resp.isSuccessful()) {
-        PdIDTO body = resp.body();
+        ProcesamientoResponseDTO body = resp.body();
+        if (body == null) {
+          throw new IllegalStateException("ProcesadorPdI devolvió cuerpo nulo");
+        }
         log.info("ProcesadorPdI → Fuentes {} {} body: {}",
                 resp.code(), resp.message(), mapper.writeValueAsString(body));
-        return body;
+        return body; // procesada true/false
       }
 
+      // No-2xx
       String errorBody = safeReadBody(resp.errorBody());
-      log.warn("ProcesadorPdI respondió error {} {}. Body: {}", resp.code(), resp.message(), errorBody);
+      log.warn("ProcesadorPdI respondió error {} {}. Body: {}",
+              resp.code(), resp.message(), errorBody);
 
       switch (resp.code()) {
-        case 404 -> throw new NoSuchElementException("PdI no procesable o recurso no encontrado");
+        case 400 -> throw new IllegalStateException("Hecho inexistente o request inválido hacia ProcesadorPdI");
+        case 404 -> throw new NoSuchElementException("Recurso de ProcesadorPdI no encontrado");
         case 422 -> throw new IllegalStateException("ProcesadorPdI rechazó la PdI (unprocessable)");
         default -> throw new RuntimeException("Error " + resp.code() + " al llamar ProcesadorPdI: " + errorBody);
       }
@@ -175,7 +194,6 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
             blankToNull(p.contenido())
     );
   }
-
 
   private static String safeReadBody(ResponseBody body) {
     if (body == null) return "";
