@@ -5,7 +5,6 @@ import ar.edu.utn.dds.k3003.facades.FachadaFuente;
 import ar.edu.utn.dds.k3003.facades.dtos.ColeccionDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.model.Coleccion;
-
 import ar.edu.utn.dds.k3003.model.Hecho;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +61,7 @@ public class ColeccionController {
         }
     }
 
-    @PostMapping("{nombre}/hechos")
+    @PostMapping("/{nombre}/hechos")
     public ResponseEntity<HechoDTO> crearHecho(
             @PathVariable("nombre") String nombreColeccion,
             @RequestBody Hecho hecho) {
@@ -74,7 +73,8 @@ public class ColeccionController {
                 hecho.getCategoria(),
                 hecho.getUbicacion(),
                 hecho.getFecha(),
-                hecho.getOrigen()
+                hecho.getOrigen(),
+                hecho.getEstado()
         );
         try {
             HechoDTO creado = fachadaFuente.agregar(hechoDTO);

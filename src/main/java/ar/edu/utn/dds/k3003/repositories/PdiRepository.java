@@ -6,8 +6,6 @@ import java.util.Objects;
 
 import ar.edu.utn.dds.k3003.model.Pdi;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 @Repository

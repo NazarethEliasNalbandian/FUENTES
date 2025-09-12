@@ -10,7 +10,7 @@ public class HechoMapper {
         if(hecho ==null){
             return null;
         }
-        HechoDTO retorno = new HechoDTO(hecho.getId(),hecho.getNombreColeccion(),hecho.getTitulo(),hecho.getEtiquetas(),hecho.getCategoria(),hecho.getUbicacion(),hecho.getFecha(),hecho.getOrigen());
+        HechoDTO retorno = new HechoDTO(hecho.getId(),hecho.getNombreColeccion(),hecho.getTitulo(),hecho.getEtiquetas(),hecho.getCategoria(),hecho.getUbicacion(),hecho.getFecha(),hecho.getOrigen(),hecho.getEstado());
         return retorno;
     }
     public Hecho map(HechoDTO hechoDTO){

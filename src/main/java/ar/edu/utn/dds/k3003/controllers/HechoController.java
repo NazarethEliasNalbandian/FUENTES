@@ -10,7 +10,6 @@ import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoEstadoRequestDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
-import ar.edu.utn.dds.k3003.model.Hecho;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +50,7 @@ public class HechoController {
     public ResponseEntity<HechoDTO> corregirEstado(@PathVariable String id,
                                                    @RequestBody HechoEstadoRequestDTO body) {
         try {
+            @SuppressWarnings("unused")
             HechoDTO hecho = fachadaFuente.buscarHechoXId(id);
             EstadoHechoEnum nuevoEstado = EstadoHechoEnum.valueOf(body.estado().toUpperCase());
 

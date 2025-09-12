@@ -6,7 +6,6 @@ import java.util.List;
 import ar.edu.utn.dds.k3003.facades.dtos.CategoriaHechoEnum;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -64,6 +63,18 @@ public class Hecho {
         ubicacion= ubicacion2;
         fecha = fecha2;
         origen = origen2;
+    }
+    public Hecho(String id_, String nombreColeccion2, String titulo2, List<String> etiquetas2,
+            CategoriaHechoEnum categoria2, String ubicacion2, LocalDateTime fecha2, String origen2, EstadoHechoEnum estado_2) {
+        id= id_;
+        nombreColeccion = nombreColeccion2;
+        titulo = titulo2;
+        etiquetas = etiquetas2;
+        categoria = categoria2;
+        ubicacion= ubicacion2;
+        fecha = fecha2;
+        origen = origen2;
+        estado = estado_2;
     }
 
     @PrePersist
