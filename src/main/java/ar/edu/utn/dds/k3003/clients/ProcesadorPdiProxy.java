@@ -191,7 +191,7 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
             emptyToNull(p.lugar()),
             iso(p.momento()),
             emptyToNull(p.contenido()),
-            emptyToNull(p.imagenUrl())   // <<< clave
+            emptyToNull(p.imageUrl())   // <<< clave
     );
   }
 

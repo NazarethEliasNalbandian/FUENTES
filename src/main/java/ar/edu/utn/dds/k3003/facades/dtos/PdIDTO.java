@@ -1,5 +1,7 @@
 package ar.edu.utn.dds.k3003.facades.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +12,8 @@ public record PdIDTO(
         String lugar,
         LocalDateTime momento,
         String contenido,
-        String imagenUrl,          // <<< NUEVO
+        @JsonProperty("image_url")
+        String imageUrl,          // <<< NUEVO
         List<String> etiquetas
 ) {
   public PdIDTO(String id, String hechoId) {

@@ -94,7 +94,7 @@ public class HechoController {
                     body.lugar(),
                     body.momento(),
                     body.contenido(),
-                    body.imagenUrl(),   // <<< importante
+                    body.imageUrl(),   // <<< importante
                     List.of()
             );
 

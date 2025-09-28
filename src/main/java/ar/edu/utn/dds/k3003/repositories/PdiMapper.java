@@ -17,7 +17,7 @@ public class PdiMapper {
         if(pdiDTO.equals(null)){
             return null;
         } // AHORA VA
-        Pdi pdiMappeado = new Pdi(pdiDTO.id(),pdiDTO.hechoId(),pdiDTO.lugar(),pdiDTO.descripcion(),pdiDTO.contenido(),pdiDTO.imagenUrl(), pdiDTO.etiquetas(),pdiDTO.momento());
+        Pdi pdiMappeado = new Pdi(pdiDTO.id(),pdiDTO.hechoId(),pdiDTO.lugar(),pdiDTO.descripcion(),pdiDTO.contenido(),pdiDTO.imageUrl(), pdiDTO.etiquetas(),pdiDTO.momento());
         return pdiMappeado;
     }
 }
