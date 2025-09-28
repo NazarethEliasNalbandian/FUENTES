@@ -36,9 +36,11 @@ public class SolicitudesClient {
 
     private RestTemplate mkTemplate() {
         var rt = new RestTemplate();
-        // opcional: timeouts (Spring Boot 3 con HttpComponentsClientHttpRequestFactory si querés afinar más)
+        rt.getMessageConverters()
+                .removeIf(c -> c.getClass().getName().contains("MappingJackson2XmlHttpMessageConverter"));
         return rt;
     }
+
 
     /** Devuelve una Solicitud si existe para ese hecho; vacío si no. */
     public Optional<SolicitudDTO> findByHecho(String hechoId) {
@@ -48,35 +50,70 @@ public class SolicitudesClient {
                 .toUriString();
 
         try {
-            ResponseEntity<String> resp = restTemplate.exchange(url, HttpMethod.GET, null, String.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.ACCEPT, "application/json"); // pedir JSON primero
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            if (resp.getStatusCode().is2xxSuccessful() && resp.getBody() != null) {
-                String body = resp.getBody().trim();
+            ResponseEntity<String> resp = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-                // Caso arreglo vacío: []
-                if (body.equals("[]")) return Optional.empty();
-
-                // ¿Es objeto?
-                if (body.startsWith("{")) {
-                    var dto = mapper.readValue(body, SolicitudDTO.class);
-                    return Optional.ofNullable(dto);
-                }
-
-                // ¿Es arreglo con 1..n?
-                if (body.startsWith("[")) {
-                    List<SolicitudDTO> list = mapper.readValue(body, new TypeReference<List<SolicitudDTO>>() {});
-                    return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
-                }
+            if (!resp.getStatusCode().is2xxSuccessful() || resp.getBody() == null) {
+                log.warn("[Solicitudes] Respuesta no exitosa para hecho {}: status={}", hechoId, resp.getStatusCodeValue());
+                return Optional.empty();
             }
 
-            // Cualquier otra cosa, lo consideramos como "no hay solicitud"
-            log.warn("[Solicitudes] Respuesta inesperada para hecho {}: status={} body={}",
-                    hechoId, resp.getStatusCodeValue(), resp.getBody());
+            String body = resp.getBody().trim();
+
+            // --- JSON clásico ---
+            if (body.startsWith("{")) {
+                var dto = mapper.readValue(body, SolicitudDTO.class);
+                return Optional.ofNullable(dto);
+            }
+            if (body.startsWith("[")) {
+                List<SolicitudDTO> list = mapper.readValue(body, new TypeReference<List<SolicitudDTO>>() {});
+                return list.isEmpty() ? Optional.empty() : Optional.of(list.get(0));
+            }
+
+            // --- XML (fallback) ---
+            if (body.startsWith("<")) {
+                // Lista vacía: <List/>  -> no hay solicitud
+                if (body.contains("<List/>")) {
+                    return Optional.empty();
+                }
+
+                // Si hay al menos un <item>, consideramos que existe solicitud
+                if (body.contains("<item>")) {
+                    // extracción simple por regex (defensiva y suficiente para decidir)
+                    String hechoIdXml = extractTag(body, "hecho_id");
+                    String descripcionXml = extractTag(body, "descripcion");
+                    if (hechoIdXml == null || hechoIdXml.isBlank()) {
+                        hechoIdXml = hechoId; // fallback
+                    }
+                    return Optional.of(new SolicitudDTO(descripcionXml, hechoIdXml));
+                }
+
+                // Cualquier otro XML lo tomamos como "no hay"
+                log.warn("[Solicitudes] XML inesperado para hecho {}: {}", hechoId, body);
+                return Optional.empty();
+            }
+
+            // Formato desconocido -> no bloquear
+            log.warn("[Solicitudes] Formato desconocido para hecho {}: {}", hechoId, body);
             return Optional.empty();
+
         } catch (Exception e) {
             log.error("[Solicitudes] Error consultando hecho {}: {}", hechoId, e.toString());
-            // Ante error de red/timeout, preferimos NO bloquear: asumimos que no hay solicitud
             return Optional.empty();
         }
     }
+
+    // Helper muy simple para extraer <tag>valor</tag> del primer item
+    private static String extractTag(String xml, String tag) {
+        int i = xml.indexOf("<" + tag + ">");
+        if (i < 0) return null;
+        int j = xml.indexOf("</" + tag + ">", i);
+        if (j < 0) return null;
+        int start = i + tag.length() + 2;
+        return xml.substring(start, j).trim();
+    }
+
 }

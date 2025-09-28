@@ -120,7 +120,7 @@ public class HechoController {
     }
 
 
-    @GetMapping("/buscarHechosSinSolicitudes")
+    @GetMapping("/sin_solicitudes")
     public ResponseEntity<List<HechoDTO>> buscarHechosSinSolicitudes() {
         var res = fachadaFuente.buscarHechosSinSolicitudes();
         return ResponseEntity.ok(res);
