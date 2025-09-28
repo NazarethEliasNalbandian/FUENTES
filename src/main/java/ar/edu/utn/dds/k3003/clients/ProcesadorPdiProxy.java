@@ -184,16 +184,25 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
     return (s == null || s.isBlank()) ? null : s.trim();
   }
 
-  private static PdICreateRequest toCreateRequest(PdIDTO p) {
-    // hechoId ya validado arriba; el resto se sanea ("" -> null)
+  private PdICreateRequest toCreateRequest(PdIDTO p) {
     return new PdICreateRequest(
             p.hechoId(),
-            blankToNull(p.descripcion()),
-            blankToNull(p.lugar()),
-            p.momento(),              // si viene null, no se serializa por @JsonInclude(NON_NULL)
-            blankToNull(p.contenido())
+            emptyToNull(p.descripcion()),
+            emptyToNull(p.lugar()),
+            iso(p.momento()),
+            emptyToNull(p.contenido()),
+            emptyToNull(p.imagenUrl())   // <<< clave
     );
   }
+
+  private static String emptyToNull(String s) {
+    return (s == null || s.isBlank()) ? null : s;
+  }
+
+  private static String iso(java.time.LocalDateTime dt) {
+    return dt == null ? null : dt.toString(); // o DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dt)
+  }
+
 
   private static String safeReadBody(ResponseBody body) {
     if (body == null) return "";

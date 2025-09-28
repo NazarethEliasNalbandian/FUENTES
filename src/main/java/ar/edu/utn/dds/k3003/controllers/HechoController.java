@@ -88,13 +88,14 @@ public class HechoController {
         try {
             // El hechoId SIEMPRE viene de la URL
             PdIDTO pdi = new PdIDTO(
-                    null,                     // lo genera Procesador
-                    id,                       // hechoId
+                    null,
+                    id,
                     body.descripcion(),
                     body.lugar(),
-                    body.momento(),           // formatear "2025-10-09T14:00:00" si hace falta
+                    body.momento(),
                     body.contenido(),
-                    List.of()                 // etiquetas del body se ignoran: vienen del Procesador
+                    body.imagenUrl(),   // <<< importante
+                    List.of()
             );
 
             // Delegamos el flujo completo (procesar + actualizar Hecho si corresponde)
