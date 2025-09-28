@@ -230,9 +230,10 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         if (proc == null) throw new IllegalStateException("ProcesadorPdI devolvió nulo");
 
         // 2) Si NO se procesó, no persistimos nada y devolvemos tal cual
-        if (!proc.procesada()) {
+        if (!"PROCESSED".equalsIgnoreCase(proc.estado())) {
             return proc;
         }
+
 
         // 3) Actualizar Hecho: unir etiquetas y agregar pdiId (sin duplicar) y persistir
         if (hecho.getEtiquetas() == null) hecho.setEtiquetas(new java.util.ArrayList<>());
