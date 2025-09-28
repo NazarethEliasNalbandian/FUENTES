@@ -33,4 +33,6 @@ public interface FachadaFuente {
   HechoDTO actualizarEstado(String hechoId, EstadoHechoEnum nuevoEstado);
 
   List<HechoDTO> hechosActivos();
+
+  List<HechoDTO>buscarHechosSinSolicitudes();
 }
