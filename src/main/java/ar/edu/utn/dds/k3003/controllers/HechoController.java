@@ -102,18 +102,20 @@ public class HechoController {
             ProcesamientoResponseDTO res = fachadaFuente.agregar(pdi);
 
             // Si procesó, 201; si no, 200 con procesada=false
-            return ResponseEntity.status(res.procesada() ? HttpStatus.CREATED : HttpStatus.OK).body(res);
+            return ResponseEntity
+                    .status("PROCESSED".equalsIgnoreCase(res.estado()) ? HttpStatus.CREATED : HttpStatus.OK)
+                    .body(res);
 
         } catch (NoSuchElementException e) {
             // No existe el Hecho (o la Colección del Hecho)
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ProcesamientoResponseDTO(null, false, List.of()));
+                    .body(new ProcesamientoResponseDTO(null, "ERROR", List.of()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new ProcesamientoResponseDTO(null, false, List.of()));
+                    .body(new ProcesamientoResponseDTO(null, "ERROR", List.of()));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(422)
-                    .body(new ProcesamientoResponseDTO(null, false, List.of()));
+                    .body(new ProcesamientoResponseDTO(null, "ERROR", List.of()));
         }
     }
 
