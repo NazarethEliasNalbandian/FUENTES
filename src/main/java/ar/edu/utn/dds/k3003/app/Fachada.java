@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import ar.edu.utn.dds.k3003.clients.SolicitudesClient;
 import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
 import ar.edu.utn.dds.k3003.model.Hecho;
@@ -32,6 +33,9 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
     private ColeccionMapper coleccionMapper;
     private HechoMapper hechoMapper;
     private PdiMapper pdiMapper;
+
+    @Autowired
+    private SolicitudesClient solicitudesClient;
 
     @Autowired
     private FachadaProcesadorPdI fachadaprocesadorPdI;
@@ -252,6 +256,14 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
 
         // 4) Devolver el resultado al caller (controller)
         return proc;
+    }
+
+    public List<HechoDTO> buscarHechosSinSolicitudes() {
+        return hechoRepository.allHechos()
+                .stream()
+                .filter(h -> solicitudesClient.findByHecho(h.getId()).isEmpty())
+                .map(hechoMapper::map)
+                .toList();
     }
 
 
