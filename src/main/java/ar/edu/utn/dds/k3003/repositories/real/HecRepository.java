@@ -4,7 +4,6 @@ import ar.edu.utn.dds.k3003.model.Hecho;
 import ar.edu.utn.dds.k3003.facades.dtos.CategoriaHechoEnum;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 public interface HecRepository {
