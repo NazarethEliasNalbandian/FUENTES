@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import ar.edu.utn.dds.k3003.CopiaMeWorker;
+import ar.edu.utn.dds.k3003.WorkerHandler;
 import ar.edu.utn.dds.k3003.clients.SolicitudesClient;
 import ar.edu.utn.dds.k3003.clients.dto.ProcesamientoResponseDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
@@ -42,7 +42,7 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
     private FachadaProcesadorPdI fachadaprocesadorPdI;
     
     @Autowired
-    private CopiaMeWorker worker; 
+    private WorkerHandler worker; 
     // Constructor vacío (opcional; no inicializa nada)
     Fachada() {
     }
@@ -65,7 +65,7 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         this.pdiMapper = pdiMapper;
     }
     @Autowired
-    public void setWorker(CopiaMeWorker worker) {
+    public void setWorker(WorkerHandler worker) {
         this.worker = worker;
         this.worker.setFachada(this);
     }

@@ -9,16 +9,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ar.edu.utn.dds.k3003.model.Hecho;
 
 @Component
-public class CopiaMeWorker {
+public class WorkerHandler {
     private Fachada fachada;
     private final ObjectMapper objectMapper;
-    public CopiaMeWorker(ObjectMapper objectMapper) {
+    public WorkerHandler(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
     public void setFachada(Fachada nueva_fachada){
         this.fachada = nueva_fachada;
     }
-    @RabbitListener(queues = "${queue.name}")
+    @RabbitListener(id = "suscripcion", queues = "${queue.name}", autoStartup = "false")
     public void handleMessage(String message) {
         System.out.println("Se recibió el siguiente payload:");
         System.out.println(message);
