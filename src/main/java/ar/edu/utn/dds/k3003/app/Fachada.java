@@ -226,6 +226,7 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
     @Override
     @jakarta.transaction.Transactional
     public ProcesamientoResponseDTO agregar(PdIDTO pdiDTO) throws IllegalStateException {
+
         if (pdiDTO == null) throw new IllegalArgumentException("PdIDTO requerido");
         if (pdiDTO.hechoId() == null || pdiDTO.hechoId().isBlank())
             throw new IllegalArgumentException("hechoId requerido en PdIDTO");
@@ -243,8 +244,12 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         }
         if (proc == null) throw new IllegalStateException("ProcesadorPdI devolvió nulo");
 
+
+        System.out.println("Recibi etiquetas: " + proc.etiquetas());
+        System.out.println("Recibi estado: " + proc.estado());
+
         // 2) Si NO se procesó, no persistimos nada y devolvemos tal cual
-        if (!"PROCESSED".equalsIgnoreCase(proc.estado())) {
+        if (!"PROCESSING".equalsIgnoreCase(proc.estado())) {
             return proc;
         }
 
