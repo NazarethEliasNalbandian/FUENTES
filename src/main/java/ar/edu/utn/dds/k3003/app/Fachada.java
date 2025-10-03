@@ -253,6 +253,9 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         if (hecho.getEtiquetas() == null) hecho.setEtiquetas(new java.util.ArrayList<>());
         if (hecho.getPdiIds() == null) hecho.setPdiIds(new java.util.ArrayList<>());
 
+        System.out.println("Recibi etiquetas: " + proc.etiquetas());
+        System.out.println("Recibi estado: " + proc.estado());
+
         java.util.LinkedHashSet<String> union = new java.util.LinkedHashSet<>(hecho.getEtiquetas());
         if (proc.etiquetas() != null) union.addAll(proc.etiquetas());
         hecho.setEtiquetas(new java.util.ArrayList<>(union));
