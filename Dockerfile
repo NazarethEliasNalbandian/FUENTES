@@ -1,12 +1,22 @@
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# Importing JDK and copying required files
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src src
-RUN mvn clean package -DskipTests
 
-FROM openjdk:17-jdk
-WORKDIR /app
+# Copy Maven wrapper
+COPY mvnw .
+COPY .mvn .mvn
+
+# Set execution permission for the Maven wrapper
+RUN chmod +x ./mvnw
+RUN ./mvnw clean package -DskipTests
+
+# Stage 2: Create the final Docker image using OpenJDK 19
+FROM eclipse-temurin:21-jdk
+VOLUME /tmp
+
+# Copy the JAR from the build stage
 COPY --from=build /app/target/*.jar app.jar
-ENV URL_PROCESADOR=https://tp-dds-2025-procesadorpdi.onrender.com
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java","-jar","/app.jar"]
 EXPOSE 8080
