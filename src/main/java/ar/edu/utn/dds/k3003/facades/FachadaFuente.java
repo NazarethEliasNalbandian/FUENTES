@@ -5,8 +5,10 @@ import ar.edu.utn.dds.k3003.facades.dtos.ColeccionDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
+import ar.edu.utn.dds.k3003.model.HechoMongo;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public interface FachadaFuente {
@@ -26,6 +28,8 @@ public interface FachadaFuente {
 
   List<ColeccionDTO> colecciones();
 
+  List<HechoMongo> buscarMongoTodos();
+  List<HechoDTO> buscarHechosFiltrados(Map<String,String> filtros);
   int borrarTodosLosHechos();
 
   int borrarTodasLasColecciones();

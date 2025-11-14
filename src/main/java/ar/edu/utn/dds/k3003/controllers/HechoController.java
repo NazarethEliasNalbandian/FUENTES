@@ -10,6 +10,7 @@ import ar.edu.utn.dds.k3003.facades.dtos.HechoDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.HechoEstadoRequestDTO;
 import ar.edu.utn.dds.k3003.facades.dtos.PdIDTO;
 import ar.edu.utn.dds.k3003.model.EstadoHechoEnum;
+import ar.edu.utn.dds.k3003.model.HechoMongo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -80,9 +81,16 @@ public class HechoController {
         }
         return ResponseEntity.ok(activos); // 200 con la lista
     }
-
+    @GetMapping("/busquedamongo")
+    public ResponseEntity<List<HechoMongo>> listarMongo(){
+        List<HechoMongo> hechosMongo = fachadaFuente.buscarMongoTodos();
+        if (hechosMongo.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 si no hay
+        }
+        return ResponseEntity.ok(hechosMongo); 
+    }
     @PostMapping("/{id}/pdis")
-    public ResponseEntity<ProcesamientoResponseDTO> agregarPdiAHecho(
+    public ResponseEntity<ProcesamientoResponseDTO> agregarPdiAHecho(   
             @PathVariable String id,
             @RequestBody PdIDTO body) {
         try {
@@ -119,12 +127,25 @@ public class HechoController {
         }
     }
 
-
     @GetMapping("/sin_solicitudes")
     public ResponseEntity<List<HechoDTO>> buscarHechosSinSolicitudes() {
         var res = fachadaFuente.buscarHechosSinSolicitudes();
         return ResponseEntity.ok(res);
     }
 
+    @GetMapping("/busqueda")
+    public ResponseEntity<?> buscar(@RequestParam Map<String, String> filtros) {
+        System.out.println(filtros);
+        for (Map.Entry<String,String> entry : filtros.entrySet()){
+            String clave  = entry.getKey();
+            String valor = entry.getValue();
+            System.out.println( "Nuestro clave-valor es: " + clave + valor);
+        }
+        List<HechoDTO> activos = fachadaFuente.buscarHechosFiltrados(filtros);
+        if (activos.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 si no hay
+        }
+        return ResponseEntity.ok(activos); // 200 con la lista
+    }
 }
 

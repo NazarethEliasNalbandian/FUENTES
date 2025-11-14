@@ -223,7 +223,40 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
 
   @Override
   public List<PdIDTO> buscarPorHecho(String hechoId) throws NoSuchElementException {
-    throw new UnsupportedOperationException("Unimplemented method 'buscarPorHecho'");
+    if (hechoId.isBlank())
+      throw new IllegalArgumentException("hechoId requerido");
+    try {
+      // Body “slim” sin nulls/strings vacíos
+      // Asegurá la firma del Retrofit:
+      // Call<ProcesamientoResponseDTO> procesar(@Body PdICreateRequest req);
+      Response<List<PdIDTO>> resp = service.buscarPorHecho(hechoId).execute();
+
+      if (resp.isSuccessful()) {
+        List<PdIDTO> body = resp.body();
+        if (body == null) {
+          throw new IllegalStateException("ProcesadorPdI devolvió cuerpo nulo");
+        }
+        return body; // procesada true/false
+      }
+
+      // No-2xx
+      String errorBody = safeReadBody(resp.errorBody());
+      log.warn("ProcesadorPdI respondió error {} {}. Body: {}",
+              resp.code(), resp.message(), errorBody);
+
+      switch (resp.code()) {
+        case 400 -> throw new IllegalStateException("Hecho inexistente o request inválido hacia ProcesadorPdI");
+        case 404 -> throw new NoSuchElementException("Recurso de ProcesadorPdI no encontrado");
+        case 422 -> throw new IllegalStateException("ProcesadorPdI rechazó la peticion (unprocessable)");
+        default -> throw new RuntimeException("Error " + resp.code() + " al llamar ProcesadorPdI: " + errorBody);
+      }
+
+    } catch (NoSuchElementException | IllegalStateException e) {
+      throw e;
+    } catch (Exception e) {
+      log.error("Fallo al conectar/llamar a ProcesadorPdI", e);
+      throw new RuntimeException("Error conectándose con el componente ProcesadorPdI", e);
+    }
   }
 
   @Override
