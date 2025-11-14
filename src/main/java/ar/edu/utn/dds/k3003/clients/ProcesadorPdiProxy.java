@@ -139,13 +139,13 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
       // Body “slim” sin nulls/strings vacíos
       PdICreateRequest req = toCreateRequest(pdi);
 
-      log.info("Fuentes → ProcesadorPdI request JSON: {}", mapper.writeValueAsString(req));
+      log.error("Fuentes → ProcesadorPdI request JSON: {}", mapper.writeValueAsString(req));
 
       // Asegurá la firma del Retrofit:
       // Call<ProcesamientoResponseDTO> procesar(@Body PdICreateRequest req);
       Response<ProcesamientoResponseDTO> resp = service.procesar(req).execute();
 
-      log.info("ProcesadorPdI status={} message={} headers={}",
+      log.error("ProcesadorPdI status={} message={} headers={}",
               resp.code(), resp.message(), resp.headers());
 
       if (resp.isSuccessful()) {
@@ -153,7 +153,7 @@ public class ProcesadorPdiProxy implements FachadaProcesadorPdI {
         if (body == null) {
           throw new IllegalStateException("ProcesadorPdI devolvió cuerpo nulo");
         }
-        log.info("ProcesadorPdI → Fuentes {} {} body: {}",
+        log.error("ProcesadorPdI → Fuentes {} {} body: {}",
                 resp.code(), resp.message(), mapper.writeValueAsString(body));
         return body; // procesada true/false
       }
