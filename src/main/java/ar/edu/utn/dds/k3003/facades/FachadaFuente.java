@@ -39,4 +39,6 @@ public interface FachadaFuente {
   List<HechoDTO> hechosActivos();
 
   List<HechoDTO>buscarHechosSinSolicitudes();
+
+  ProcesamientoResponseDTO aplicarProcesamiento(String hechoId, ProcesamientoResponseDTO proc);
 }

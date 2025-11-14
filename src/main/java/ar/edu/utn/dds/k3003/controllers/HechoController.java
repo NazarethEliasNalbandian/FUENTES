@@ -65,6 +65,39 @@ public class HechoController {
         }
     }
 
+
+    @PatchMapping("/{id}/procesamiento")
+    public ResponseEntity<?> aplicarProcesamiento(
+            @PathVariable String id,
+            @RequestBody ProcesamientoResponseDTO body) {
+
+        try {
+            // 1) Buscar el hecho
+            HechoDTO hecho = fachadaFuente.buscarHechoXId(id);
+            if (hecho == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Hecho no encontrado");
+            }
+
+            // 2) Aplicar procesamiento por fachada
+            //    (Esto internamente hace: unir etiquetas + actualizar pdis + persistir en ambas DBs)
+            ProcesamientoResponseDTO actualizado = fachadaFuente.aplicarProcesamiento(id, body);
+
+            return ResponseEntity.ok(actualizado);
+
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Hecho inexistente");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body("Datos inválidos");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+    }
+
+
+
     @DeleteMapping
     public ResponseEntity<Map<String, Object>> borrarTodos() {
         int eliminados = fachadaFuente.borrarTodosLosHechos();
