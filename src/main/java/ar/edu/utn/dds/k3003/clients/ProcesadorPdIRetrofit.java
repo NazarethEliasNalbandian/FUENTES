@@ -11,7 +11,11 @@ import retrofit2.http.*;
 public interface ProcesadorPdIRetrofit {
     @POST("/api/pdis")
     Call<ProcesamientoResponseDTO> procesar(@Body PdICreateRequest pdi);
+
+/*    @GET("/api/pdis")
+    Call<List<PdIDTO>> buscarPorHecho2(@Query("hecho") String hechoId);*/
+
     @GET("/api/pdis")
-    Call<List<PdIDTO>> buscarPorHecho(@Query("hecho") String hechoId);
+    Call<List<PdIDTO>> buscarPorHecho(@Body String idHecho);
 
 }
