@@ -327,10 +327,20 @@ public class Fachada implements ar.edu.utn.dds.k3003.facades.FachadaFuente {
         HechoMongo hechoMongo = repositoryMongo.buscarPorId(hecho.getId());
         if (hechoMongo != null) {
 
+            System.out.println("--------------------------------------");
+            System.out.println("📌 MONGO → HechoMongo ANTES de actualizar:");
+            System.out.println("   Etiquetas Mongo DESPUÉS: " + hechoMongo.getEtiquetas());
+            System.out.println("   PdiIds Mongo DESPUÉS   : " + hechoMongo.getPdiIds());
+
             hechoMongo.setEtiquetas(hecho.getEtiquetas());
 
-            List<PdIDTO> pdis = this.fachadaprocesadorPdI.buscarPorHecho(hechoMongo.getId());
-            hechoMongo.setPdiIds(pdis.stream().map(mongoMapperPdi::mapDTO).toList());
+            System.out.println("--------------------------------------");
+            System.out.println("📌 MONGO → HechoMongo DESPUÉS de actualizar:");
+            System.out.println("   Etiquetas Mongo DESPUÉS: " + hechoMongo.getEtiquetas());
+            System.out.println("   PdiIds Mongo DESPUÉS   : " + hechoMongo.getPdiIds());
+
+/*          List<PdIDTO> pdis = this.fachadaprocesadorPdI.buscarPorHecho(hechoMongo.getId());
+            hechoMongo.setPdiIds(pdis.stream().map(mongoMapperPdi::mapDTO).toList());*/
 
             repositoryMongo.guardarDesdeDTO(hechoMongo);
         }
